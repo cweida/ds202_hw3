@@ -1,0 +1,125 @@
+---
+title: 'Homework #3'
+author: 'Chase Weida; Github: cweida'
+date: "2/12/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+data(tips, package="reshape2")
+
+library(ggplot2)
+```
+
+
+### 1
+How many parties did the waiter serve? Store the number in numParty and print.
+
+```{r}
+length(tips$total_bill)
+numParty <- length(tips$total_bill)
+numParty
+```
+
+### 2
+What are the types of variables in the data frame tips?
+Include the code and also explain verbally.
+
+```{r}
+str(tips)
+```
+
+As one can see, the data type for each column of the data frame are:
+
+total_bill= num  
+tip       = num  
+sex       = Factor  
+smoker    = Factor  
+day       = Factor  
+time      = Factor  
+size      = int  
+
+
+### 3
+Create a vector named day containing the day of visits in tips. 
+The factor levels should be ordered from Thursday to Sunday. Print the variable.
+
+```{r}
+day <- tips$day[order(factor(tips$day,levels = c('Thur', 'Fri', "Sat", "Sun")))]
+day
+```
+
+### 4
+Create a data frame named female5 containing the meal paid by a female payer in a party with size greater than or equal to 5. 
+Print the data frame.
+
+```{r}
+female5 <- tips[tips$sex == "Female" & tips$size >= 5,]
+female5
+```
+
+### 5
+How does the tipping amount (tip) depend on the overall bill (total_bill)? 
+Use the ggplot2 package to make a chart. Describe the relationship in words.
+
+```{r}
+ggplot(tips,aes(x = total_bill, y = tip)) + geom_point() + ggtitle("Tips vs Total_bill")
+```
+
+Upon visual inspection, one can see a linear relationship between the size of the total bill and tip size. As the bill increases, the tip grows slowly.
+
+### 6
+Describe at least two types of anomalies in the previous plot. 
+What do they mean?
+
+One can see that there is a point which falls below the 10 dollar total bill cost and above the 5 dollar tip point. This means that someone tipped well above average on that particular bill, in excess of 50%.
+Additionally, one can see a data point which falls above the 30 dolla total bill cost and well below the 2.5 dollar tip level. This means that they tipped well below the average. This tip was probably below 5%.
+
+### 7
+Introduce a variable tiprate into the data set which stands for the rate of tips. What is the average rate for tips? Explain verbally.
+
+```{r}
+tipRate <- tips$tip/tips$total_bill
+tips$tipRate <- tipRate
+meanTip <- mean(tips$tipRate)
+meanTip
+```
+
+As demonstrated above, the mean value of the tipRate column is approximately .16 or 16%. Thus, the average party for this particular waiter gave about 16% of the bill as a tip. This is 1% above the customary 15% tip.
+
+### 8
+
+Make a boxplot of the tip rate by time. 
+The x-axis should be ordered by lunch and then dinner. Use ggplot2 to make a chart. Verbally explain the chart.
+
+```{r}
+tipByTime <- tips[order(factor(tips$time,levels = c('Lunch','Dinner'))),]
+ggplot(tipByTime, aes(x = time, y = tipRate)) + geom_boxplot() + ggtitle("Tips by Time of Day")
+```
+
+### 9
+
+How does smoking behavior and gender of the person who pays impact the relationship between tip and total bill? 
+Find a visualization that incorporates all four variables. Interpret the result.
+
+```{r}
+ggplot(tips) + geom_smooth(aes(x = total_bill, y = tip, color = sex),se = FALSE) + geom_smooth(aes(x = total_bill, y = tip, color = smoker), se = FALSE)
+
+```
+
+From the graph one can see individual regression lines for the tips vs total_bill in each of the four categories (Females, Males, non Smokers, and Smokers). As you can see, both Males and Smokers follow similar trends. As the bill increases, the tip increases at a greater and greater rate. However, for Females, as the total_bill increases, the tip size does not grow linearly and even drops. Non smokers follow a mostly linear trend that does not drop off with the increase in total bill size.
+
+### 10
+
+Use ggplot2 to find a graphical summary of the relationship between day of the week and gender of the person paying the bill. What can you say about this relationship?
+
+```{r}
+ggplot(tips, aes(x = day, fill = sex )) + geom_bar()
+```
+
+It is quite apparent that there were fewer data points collected on Friday. However, on Thursday and Friday the rate of Male to Female payers is about 50/50. However, on Saturdays and Sundays the rate of Male to Female payers is skewed much more heavily towards Males. Perhaps Saturdays and Sundays have more Male payers due to formal dates where a man may be more inclined to pay.
+
+
+
+
